@@ -19,7 +19,7 @@
         <b-form-group id="input-group-1" label="Nombre:" label-for="input-1">
           <b-form-input
             id="input-1"
-            v-model="productoAEditar.data.nombre"
+            v-model="productoAEditar.nombre"
             type="text"
             required
           ></b-form-input>
@@ -32,10 +32,10 @@
           label-for="input-2"
         >
           <div  class="d-flex align-items-center justify-content-between flex-wrap">
-            <div v-for="({talla}, i) in productoAEditar.data.tallas" :key="i" class="d-flex align-items-center">
+            <div v-for="({talla}, i) in productoAEditar.tallas" :key="i" class="d-flex align-items-center">
             <p class="m-0">{{talla}}:</p>
             <b-form-input
-              v-model="productoAEditar.data.tallas[i].stock"
+              v-model="productoAEditar.tallas[i].stock"
               type="number"
               required
               class="mx-3"
@@ -49,7 +49,7 @@
         <b-form-group v-if="productoAEditar" id="input-group-2" label="Detalle:" label-for="input-2">
           <b-form-textarea
             id="input-2"
-            v-model="productoAEditar.data.detalle"
+            v-model="productoAEditar.detalle"
             type="text"
             required
           ></b-form-textarea>
@@ -57,7 +57,7 @@
 
         <!--Temática-->
         <b-form-group id="input-group-6" label="Temática:" label-for="input-6">
-          <b-form-select v-model="productoAEditar.data.tematica">
+          <b-form-select v-model="productoAEditar.tematica">
             <b-form-select-option value="frases"
               >Fraces Motivacionales</b-form-select-option
             >
@@ -73,7 +73,7 @@
         <b-form-group id="input-group-3" label="Precio:" label-for="input-3">
           <b-form-input
             id="input-3"
-            v-model="productoAEditar.data.precio"
+            v-model="productoAEditar.precio"
             type="number"
             required
           ></b-form-input>
@@ -81,7 +81,7 @@
 
         <!--Oferta-->
         <b-form-group id="input-group-4" label="Oferta:" label-for="input-4">
-          <b-form-select v-model="productoAEditar.data.oferta">
+          <b-form-select v-model="productoAEditar.oferta">
             <b-form-select-option type="boolean" :value="true"
               >Sí</b-form-select-option
             >
@@ -92,7 +92,7 @@
         </b-form-group>
 
         <!--Oferta-monto-->
-        <div v-if="productoAEditar.data.oferta">
+        <div v-if="productoAEditar.oferta">
           <b-form-group
             id="input-group-5"
             label="Monto a Descontar:"
@@ -100,7 +100,7 @@
           >
             <b-form-input
               id="input-5"
-              v-model="productoAEditar.data.ofertaMonto"
+              v-model="productoAEditar.ofertaMonto"
               type="number"
               required
             ></b-form-input>
@@ -115,18 +115,18 @@
         >
           <b-form-input
             id="input-6"
-            v-model="productoAEditar.data.imagen"
+            v-model="productoAEditar.imagen"
             type="text"
             required
           ></b-form-input>
           <div
             class="d-flex justify-content-center align-items-center my-2"
-            v-if="productoAEditar.data.imagen"
+            v-if="productoAEditar.imagen"
           >
             <p>Tu imagen:</p>
             <img
               id="imagenDePrueba"
-              :src="productoAEditar.data.imagen"
+              :src="productoAEditar.imagen"
               alt="Imagen Producto"
               style="width: 100px;"
             />
@@ -165,12 +165,12 @@ export default {
       this.productos.map((p) => {
       if(p.id === this.id) productoSeleccionado = p;
       });
-      this.productoAEditar = { ...productoSeleccionado };
+      this.productoAEditar = { ...productoSeleccionado.data };
       this.$refs["editing-product-modal"].show();
     },
     updateProduct() {
     const { nombre, precio, detalle, oferta, ofertaMonto, imagen, tematica, tallas } =
-        this.productoAEditar.data;
+        this.productoAEditar;
       if (
         nombre == "" ||
         precio == 0 ||
@@ -185,14 +185,17 @@ export default {
         );
       } else if (oferta && ofertaMonto >= precio) {
         alert("El descuento por oferta debe ser inferior al precio original.");
-      } else if (tallas.reduce((acc, {stock}) => {return acc+ +stock},0) == 0) {
-        this.productoAEditar.data.estado = false;
       } else {
-        this.update_Product(this.productoAEditar);
+        if (tallas.reduce((acc, {stock}) => {return acc+ +stock},0) == 0) {
+        this.productoAEditar.estado = false;
+        }
+        const {productoAEditar} = this
+        const producto = {data: productoAEditar, id: this.id}
+        this.update_Product(producto);
         this. productoAEditar = {
         data: {},
         id: "",
-        },
+        }
         this.hideModal();
       }
     },

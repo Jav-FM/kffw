@@ -3,11 +3,11 @@
     <div id="brand">
       <img
         id="banner__logo"
-        src="../../assets/logokffwtransparente.png"
+        src="../../assets/logofinal.png"
         alt="logo"
         class="mr-2"
       />
-      <h1>Kung Fu <br>Fashion Wear</h1>
+      <h1 id="brandName">Kung Fu <br>Fashion Wear</h1>
     </div>
     <div id="bannerBottom" class=" d-flex justify-content-end align-items-end">
       <p class="mb-0 mr-1">
@@ -60,9 +60,10 @@
   width: 120px;
 }
 
-#brand h1 {
-  color: white;
-  text-shadow: 2px 2px #000000;
+#brandName {
+  color: rgb(253, 253, 253);
+  text-shadow: 3px 3px #000000;
+  font-size: 50px;
 }
 
 #bannerBottom {
@@ -77,7 +78,7 @@
   text-decoration: none;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 599px) {
   #brand {
   flex-direction: column;
   text-align: center;

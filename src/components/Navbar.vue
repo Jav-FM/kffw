@@ -9,7 +9,7 @@
       <div class="d-flex align-items-center justify-content-start">
         <img
           id="navbar_image"
-          src="../assets/logokffw.png"
+          src="../assets/logofinal.png"
           class="mr-3"
           alt="Logo"
         />
@@ -22,7 +22,7 @@
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
       <b-collapse id="nav-collapse" is-nav>
-        <b-navbar-nav class="d-flex align-items-center justify-content-center">
+        <b-navbar-nav class="d-flex justify-content-center">
           <b-nav-item to="/">Tienda</b-nav-item>
           <b-nav-item to="quienessomos">Quienes somos</b-nav-item>
           <b-nav-item to="formulariodecontacto"
@@ -31,13 +31,13 @@
           <b-nav-item to="terminosycondiciones"
             >Términos y condiciones</b-nav-item
           >
-          <h5 v-if="logedInUser" class="mb-0 mx-2">
+          <h5 id="badgeAdministracion" v-if="logedInUser" class="mb-0">
             <b-badge to="adminproductos" variant="light">Administrar</b-badge>
           </h5>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
-        <b-navbar-nav class="ml-auto d-flex align-items-center">
+        <b-navbar-nav class="ml-auto" id="adminInfo">
           <b-nav-text v-if="logedInUser" class="mr-2">{{
             logedInUser
           }}</b-nav-text>
@@ -51,7 +51,7 @@
           ></b-icon>
           <b-icon
             v-if="logedInUser"
-            class="logIcon"
+            class="logIcon ml-1"
             icon="box-arrow-right"
             variant="light"
             font-scale="2"
@@ -120,6 +120,29 @@ h1 {
 @media screen and (min-width: 600px) {
   #littleBrandTitle {
     display: none;
+  }
+}
+
+@media screen and (min-width: 995px) {
+  #badgeAdministracion {
+    margin-right: 10px;
+    margin-left: 10px;
+    align-self: center;
+  }
+  #adminInfo {
+    display: flex;
+    align-items: center;
+  }
+}
+
+@media screen and (max-width: 994px) {
+  #adminInfo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  #badgeAdministracion {
+    margin-top: 5px;
   }
 }
 </style>

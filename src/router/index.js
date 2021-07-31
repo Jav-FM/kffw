@@ -7,6 +7,7 @@ import FormularioContacto from "@/views/FormularioContacto"
 import QuienesSomos from "@/views/QuienesSomos"
 import TerminosYCondiciones from "@/views/TerminosYCondiciones"
 import Carrito from "@/views/Carrito"
+import Store from "../store"
 
 import firebase from 'firebase'
 
@@ -64,7 +65,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to,from,next) => {
-  let user = firebase.auth().currentUser;
+  let user = Store.state.logedInUser;
   let authRequired = to.matched.some(route =>
     route.meta.login);
     if (!user && authRequired) {

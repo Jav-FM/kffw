@@ -127,7 +127,7 @@
         <div v-if="nuevoProducto.oferta">
           <b-form-group
             id="input-group-5"
-            label="Monto a Descontar:"
+            label="Monto a descontar:"
             label-for="input-5"
           >
             <b-form-input
@@ -175,6 +175,8 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
   name: "ModalCrearProducto",
   data() {
@@ -198,6 +200,7 @@ export default {
     };
   },
   methods: {
+    ...mapActions(["create_Product"]),
     sendNewProduct() {
       const {
         nombre,
@@ -221,16 +224,20 @@ export default {
         alert(
           "Si el producto está en oferta, debes indicar el monto de descuento."
         );
-      } else if (oferta && ofertaMonto >= precio) {
+      } else if (oferta == true && +ofertaMonto >= +precio) {
         alert("El descuento por oferta debe ser inferior al precio original.");
-      } else if (
+      } else {
+
+      if (
         tallas.reduce((acc, { stock }) => {
           return acc + +stock;
         }, 0) == 0
       ) {
         this.nuevoProducto.estado = false;
-      } else {
-        this.$emit("getNewProduct", this.nuevoProducto);
+        
+      } 
+      const newProduct = { ...this.nuevoProducto };
+        this.createProduct(newProduct);
         this.nuevoProducto = {
           nombre: "",
           tallas: [
@@ -249,6 +256,9 @@ export default {
         };
         this.hideModal();
       }
+    },
+    createProduct(newProduct) {
+      this.create_Product(newProduct);
     },
     showModal() {
       this.$refs["create-product-modal"].show();

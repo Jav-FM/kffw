@@ -64,7 +64,9 @@
           </b-form-invalid-feedback>
         </b-form-group>
         <div class="d-flex justify-content-center">
-          <b-button type="submit" class="botonNegro mx-1">Enviar</b-button>
+          <b-button type="submit" class="botonNegro mx-1" @click="enviarCorreo"
+            >Enviar</b-button
+          >
           <b-button type="reset" class="botonRojo mx-1">Limpiar</b-button>
         </div>
       </b-form>
@@ -73,21 +75,9 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  computed: {
-    nameState() {
-      return this.form.name.length > 2 ? true : false;
-    },
-    emailState() {
-      return this.form.email.length > 3 ? true : false;
-    },
-    messageState() {
-      return this.form.message.length > 6 ? true : false;
-    },
-    numberState() {
-      return this.form.number.length > 6 ? true : false;
-    },
-  },
   data() {
     return {
       form: {
@@ -106,11 +96,40 @@ export default {
     },
     onReset(event) {
       event.preventDefault();
-      // Reset our form values
       this.form.name = "";
       this.form.email = "";
       this.form.number = "";
       this.form.message = "";
+    },
+    async enviarCorreo() {
+      await axios.post("http://localhost:3000/mail", {
+        "to": "nodemailerADL@gmail.com",
+        "subject": "Hola! de Javi desde Vue",
+        "params": {
+          "nombre": this.form.name,
+          "correo": this.form.email,
+          "telefono": this.form.number,
+          "mensaje": this.form.message,
+        },
+      });
+      this.form.name = "";
+      this.form.email = "";
+      this.form.number = "";
+      this.form.message = "";
+    },
+  },
+  computed: {
+    nameState() {
+      return this.form.name.length > 2 ? true : false;
+    },
+    emailState() {
+      return this.form.email.length > 3 ? true : false;
+    },
+    messageState() {
+      return this.form.message.length > 6 ? true : false;
+    },
+    numberState() {
+      return this.form.number.length > 6 ? true : false;
     },
   },
 };

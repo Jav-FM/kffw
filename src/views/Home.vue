@@ -35,13 +35,13 @@
 
             <!-- Right aligned nav items -->
             <b-navbar-nav class="ml-auto">
-              <b-nav-form>
+              <b-nav-form id="buscador">
                 <b-form-input
                   size="sm"
                   class="mr-sm-2"
                   placeholder="Nombre Producto"
                 ></b-form-input>
-                <b-button onmousedown="event.preventDefault()" size="sm" class="btn my-2 my-sm-0 botonRojo"
+                <b-button onmousedown="event.preventDefault()" size="sm" class="btn btnBuscar my-2 my-sm-0 botonRojo"
                   >Buscar</b-button
                 >
               </b-nav-form>
@@ -51,11 +51,10 @@
                   icon="cart-fill"
                   variant="light"
                   font-scale="1.5"
-                  class="ml-2"
                   id="cartIcon"
                   @click="goToCart"
                 ></b-icon>
-                <b-badge pill variant="danger">0</b-badge>
+                <b-badge pill variant="danger">{{getCartNumber}}</b-badge>
               </div>
             </b-navbar-nav>
           </b-collapse>
@@ -70,6 +69,7 @@
 <script>
 import Banner from "@/components/home/Banner";
 import ProductsGallery from "@/components/home/ProductsGallery";
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 export default {
   name: "Home",
@@ -78,9 +78,17 @@ export default {
     ProductsGallery,
   },
   methods: {
+    ...mapActions(["get_Products"]),
     goToCart() {
       this.$router.push("carrito")
-    }
+    },
+  },
+  computed: {
+    ...mapState(["carrito"]),
+    ...mapGetters(["getCartNumber"]),
+  },
+  created() {
+    this.get_Products();
   }
 };
 </script>
@@ -98,4 +106,24 @@ export default {
   top: 0px;
   z-index: 1
 }
+
+@media screen and (max-width: 994px) {
+  #buscador {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    margin-bottom: 10px;
+    margin-top: 10px;
+  }
+  #cartIcon {
+    margin-left: 0px;
+  }
+}
+
+@media screen and (min-width: 995px) {
+  #cartIcon {
+    margin-left: 5px;
+  }
+}
+
 </style>

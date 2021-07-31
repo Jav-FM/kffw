@@ -1,7 +1,7 @@
 <template>
   <div class="container d-flex justify-content-around flex-wrap mt-5 mb-5">
     <!--Card de producto-->
-    <div v-for="({data}, i) in productos" :key="i" class="productCard m-2">
+    <div v-for="({data, id: productId}, i) in productos" :key="i" class="productCard m-2">
       <b-card
         header="featured"
         header-tag="header"
@@ -18,7 +18,7 @@
             <h4 v-if="data.estado" class="mb-0 mr-1">
               Disponible
             </h4>
-            <h4 v-if="!data.estado" class="mb-0 mr-1" style="color=red;">
+            <h4 v-if="!data.estado" class="mb-0 mr-1" style="color:red;">
               No disponible
             </h4>
             <b-badge v-if="data.oferta" variant="danger">¡En oferta!</b-badge>
@@ -31,8 +31,8 @@
         </template>
 
         <b-card-text class="d-flex">
-          <p :class="{tachado: data.oferta}" class="mb-0 mr-1">$ {{data.precio}}</p>
-          <p v-if="data.oferta" style="color:red;" class="mb-0"><b>{{data.precio-data.ofertaMonto}}</b></p>
+          <p :class="{tachado: data.oferta}" class="mb-0 mr-1">${{data.precio}}</p>
+          <p v-if="data.oferta" style="color:red;" class="mb-0"><b>${{data.precio-data.ofertaMonto}}</b></p>
         </b-card-text>
 
         <div class="d-flex justify-content-around">
@@ -42,7 +42,7 @@
         </div>
 
         <!--Modal con detalle de producto-->
-        <b-modal :id="'modal' + i" size="xl" centered :title="data.nombre">
+        <b-modal :id="'modal' + i" size="xl" centered :title="data.nombre" hide-footer>
           <div class="d-flex justify-content-center">
             <div class="mx-3">
               <img
@@ -70,7 +70,7 @@
                 style="width: 110px"
                 onmousedown="event.preventDefault()"
                 :disabled="!tallaSeleccionada"
-                v-b-toggle.sidebar-carrito @click="addToCart(); $bvModal.hide(modalId(i))"
+                v-b-toggle.sidebar-carrito @click="addToCart(productId); $bvModal.hide(modalId(i))"
                 >Agregar <b-icon icon="cart-plus-fill"></b-icon></b-button
               ><br />
               <p>
@@ -85,21 +85,13 @@
     <b-sidebar id="sidebar-carrito" title="Tu carro de compras" right shadow>
       <div class="px-3 py-2">
         <b-list-group>
-          <b-list-group-item class="d-flex align-items-center">
+          <b-list-group-item v-for="({imagen, nombre}, i) in carrito" :key="i" class="d-flex align-items-center">
             <img
               style="width: 50px"
-              src="../../assets/Mockups_Poleras_01.jpg"
+              :src="imagen"
               alt="foto producto"
             />
-            <p class="ml-3">Nombre producto</p>
-          </b-list-group-item>
-          <b-list-group-item class="d-flex align-items-center">
-            <img
-              style="width: 50px"
-              src="../../assets/Mockups_Poleras_01.jpg"
-              alt="foto producto"
-            />
-            <p class="ml-3">Nombre producto</p>
+            <p class="ml-3">{{nombre}}</p>
           </b-list-group-item>
         </b-list-group>
         <!--Sidebar footer-->
@@ -116,28 +108,38 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
 export default {
   name: "ProductsGallery",
   data() {
     return {
-      cards: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
       tallaSeleccionada: "",
     };
   },
   methods: {
+    ...mapActions(["add_To_Cart","aumentar_Carrito"]),
     modalId(i) {
       return "modal" + i;
     },
     goToCart() {
       this.$router.push("carrito");
     },
-    addToCart() {
-    }
+    addToCart(idProducto) {
+      const {tallaSeleccionada} = this;
+      if (this.carrito.some(({id, tallas}) => id === idProducto && tallas === tallaSeleccionada)) {
+        return this.aumentar_Carrito(idProducto)
+      } else {
+      const infoProducto = {
+        id: idProducto,
+        talla: tallaSeleccionada
+      }
+      this.add_To_Cart(infoProducto);
+      }
+    },
   },
   computed: {
-    ...mapState(["productos"]),
+    ...mapState(["productos","carrito"]),
   }
 };
 </script>
@@ -149,7 +151,5 @@ export default {
 .tachado {
   text-decoration:line-through;
 }
-#parradoAlerta {
-  color: red;
-}
+
 </style>

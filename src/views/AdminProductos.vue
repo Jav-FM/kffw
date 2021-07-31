@@ -11,7 +11,7 @@
           @click="getProducts"
           >Actualizar productos</b-button
         >
-        <ModalCrearProducto @getNewProduct="createProduct(nuevoProducto)"></ModalCrearProducto>
+        <ModalCrearProducto></ModalCrearProducto>
       </div>
 
       <div id="buscador" class="d-flex mt-4 align-items-end">
@@ -114,16 +114,11 @@ export default {
   methods: {
     ...mapActions([
       "get_Products",
-      "create_Product",
     ]),
     getProducts() {
       this.get_Products();
     },
-    createProduct(nuevoProducto) {
-      const newProduct = { ...nuevoProducto };
-      console.log(newProduct)
-      this.create_Product(newProduct);
-    },
+
   },
   computed: {
     ...mapState(["productos"]),
@@ -132,11 +127,15 @@ export default {
         const stocktotal = +data.tallas.reduce((acc, { stock }) => {
           return acc + +stock;
         }, 0);
-        data.stocktotal = stocktotal;
-        data.id = id;
-        return data;
+        let dataAMostrar = {...data}
+        dataAMostrar.stocktotal = stocktotal;
+        dataAMostrar.id = id;
+        return dataAMostrar;
       });
     },
+  },
+  created() {
+    this.get_Products();
   }
 };
 </script>
