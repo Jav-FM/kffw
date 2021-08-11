@@ -7,9 +7,9 @@
         alt="logo"
         class="mr-2"
       />
-      <h1 id="brandName">Kung Fu <br>Fashion Wear</h1>
+      <h1 id="brandName">Kung Fu <br />Fashion Wear</h1>
     </div>
-    <div id="bannerBottom" class=" d-flex justify-content-end align-items-end">
+    <div id="bannerBottom" class="d-flex justify-content-end align-items-end">
       <p class="mb-0 mr-1">
         Illustration Designed By 幻影笑笑 From
         <a
@@ -73,15 +73,15 @@
   height: 10%;
 }
 
-#bannerBottom a{
+#bannerBottom a {
   color: white;
   text-decoration: none;
 }
 
 @media screen and (max-width: 599px) {
   #brand {
-  flex-direction: column;
-  text-align: center;
+    flex-direction: column;
+    text-align: center;
   }
 }
 </style>

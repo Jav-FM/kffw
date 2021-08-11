@@ -31,22 +31,33 @@
           label="Stock por talla:"
           label-for="input-2"
         >
-          <div  class="d-flex align-items-center justify-content-between flex-wrap">
-            <div v-for="({talla}, i) in productoAEditar.tallas" :key="i" class="d-flex align-items-center">
-            <p class="m-0">{{talla}}:</p>
-            <b-form-input
-              v-model="productoAEditar.tallas[i].stock"
-              type="number"
-              required
-              class="mx-3"
-              style="width: 70px;"
-            ></b-form-input>
+          <div
+            class="d-flex align-items-center justify-content-between flex-wrap"
+          >
+            <div
+              v-for="({ talla }, i) in productoAEditar.tallas"
+              :key="i"
+              class="d-flex align-items-center"
+            >
+              <p class="m-0">{{ talla }}:</p>
+              <b-form-input
+                v-model="productoAEditar.tallas[i].stock"
+                type="number"
+                required
+                class="tallaInput mx-3"
+                style="width: 70px"
+              ></b-form-input>
             </div>
           </div>
-        </b-form-group> -->
+        </b-form-group>
 
         <!--Detalle-->
-        <b-form-group v-if="productoAEditar" id="input-group-2" label="Detalle:" label-for="input-2">
+        <b-form-group
+          v-if="productoAEditar"
+          id="input-group-2"
+          label="Detalle:"
+          label-for="input-2"
+        >
           <b-form-textarea
             id="input-2"
             v-model="productoAEditar.detalle"
@@ -110,34 +121,54 @@
         <!--Imagen-->
         <b-form-group
           id="input-group-6"
-          label="Url imagen:"
+          label="Imagen:"
           label-for="input-6"
         >
-          <b-form-input
+          <b-form-file
             id="input-6"
-            v-model="productoAEditar.imagen"
-            type="text"
+            v-model="file"
+            placeholder="Selecciona una imagen o arrastrala aquí..."
+            drop-placeholder="Arrastrala aquí..."
+            @change="setImg"
             required
-          ></b-form-input>
+          ></b-form-file>
+          <!--Preview imagen sin editar-->
           <div
             class="d-flex justify-content-center align-items-center my-2"
-            v-if="productoAEditar.imagen"
+            v-if="!imgForPreview"
           >
             <p>Tu imagen:</p>
             <img
-              id="imagenDePrueba"
-              :src="productoAEditar.imagen"
+              class="imagenDePruebaEdicion"
+              
+              :src="productoAEditar.imagen.url"
               alt="Imagen Producto"
-              style="width: 100px;"
+            />
+          </div>
+          <!--Preview imagen editada-->
+          <div
+            class="d-flex justify-content-center align-items-center my-2"
+            v-if="imgForPreview"
+          >
+            <p>Tu imagen:</p>
+            <img
+              class="imagenDePruebaEdicion"
+              :src="imgForPreview"
+              alt="Imagen Producto"
             />
           </div>
         </b-form-group>
       </div>
       <div class="buttons d-flex justify-content-center">
-        <b-button  class="btn botonNegro m-2" @click="updateProduct"
-          >Editar</b-button
+        <b-button
+          class="btn botonNegro m-2"
+          @click="updateProduct"
+          id="guardarCambiosBtn"
+          >Guardar cambios</b-button
         >
-        <b-button class="btn botonRojo m-2" @click="hideModal">Cancelar</b-button>
+        <b-button class="btn botonRojo m-2" @click="hideModal"
+          >Cancelar</b-button
+        >
       </div>
     </b-modal>
   </div>
@@ -145,14 +176,18 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
+import firebase from 'firebase';
+
 export default {
   name: "ModalEditarProducto",
   data() {
     return {
       productoAEditar: {
-        data: {},
-        id: "",
+        imagen:{},
       },
+      file: null,
+      imgForPreview: "",
+      imagenAEliminar: "",
     };
   },
   props: {
@@ -163,14 +198,22 @@ export default {
     prepareModalToEdit() {
       let productoSeleccionado = {};
       this.productos.map((p) => {
-      if(p.id === this.id) productoSeleccionado = p;
+        if (p.id === this.id) productoSeleccionado = p;
       });
       this.productoAEditar = { ...productoSeleccionado.data };
       this.$refs["editing-product-modal"].show();
     },
-    updateProduct() {
-    const { nombre, precio, detalle, oferta, ofertaMonto, imagen, tematica, tallas } =
-        this.productoAEditar;
+    async updateProduct() {
+      const {
+        nombre,
+        precio,
+        detalle,
+        oferta,
+        ofertaMonto,
+        imagen,
+        tematica,
+        tallas,
+      } = this.productoAEditar;
       if (
         nombre == "" ||
         precio == 0 ||
@@ -179,32 +222,75 @@ export default {
         tematica == ""
       ) {
         alert("Debes completar todos los campos.");
-      } else if (oferta && ofertaMonto == 0) {
+      } else if (oferta && +ofertaMonto === 0) {
         alert(
           "Si el producto está en oferta, debes indicar el monto de descuento."
         );
-      } else if (oferta && ofertaMonto >= precio) {
-        alert("El descuento por oferta debe ser inferior al precio original.");
+      } else if (oferta && +ofertaMonto >= +precio) {
+        alert(
+          "HOLAAA El descuento por oferta debe ser inferior al precio original."
+        );
       } else {
-        if (tallas.reduce((acc, {stock}) => {return acc+ +stock},0) == 0) {
-        this.productoAEditar.estado = false;
+        if(this.file) {
+          await this.uploadFile();
+          await this.deleteImg();
         }
-        const {productoAEditar} = this
-        const producto = {data: productoAEditar, id: this.id}
+
+        const { productoAEditar } = this;
+        const producto = { data: productoAEditar, id: this.id };
         this.update_Product(producto);
-        this. productoAEditar = {
-        data: {},
-        id: "",
-        }
+        this.productoAEditar = {
+          imagen:{},
+        };
         this.hideModal();
+        this.file = null;
+        this.imgForPreview = "";
       }
     },
     hideModal() {
-        this.$refs["editing-product-modal"].hide();
-    }
+      this.$refs["editing-product-modal"].hide();
+    },
+    setImg(e) {
+      const file = e.target.files[0];
+      this.file = file;
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        this.imgForPreview = reader.result;
+      };
+    },
+    async uploadFile() {
+      const { file, file: { name: nameFile } } = this;
+      const storageRef = firebase.storage().ref();
+      const fileDirection = storageRef.child(`imagenesproductos/${nameFile}`);
+      await fileDirection.put(file);
+      const url = await fileDirection.getDownloadURL();
+      this.imagenAEliminar = this.productoAEditar.imagen.nameFile;
+      this.productoAEditar.imagen = {
+        url,
+        nameFile,
+      };
+      return true;
+    },
+    async deleteImg() {
+      const { imagenAEliminar } = this;
+      try {
+        const storageRef = firebase.storage().ref();
+        const fileDirection = storageRef.child(`imagenesproductos/${imagenAEliminar}`);
+        await fileDirection.delete();
+      } catch (e) {
+        console.log(e);
+      }
+    },
   },
   computed: {
     ...mapState(["productos"]),
   },
 };
 </script>
+
+<style scoped>
+  .imagenDePruebaEdicion {
+    width: 100px;
+  }
+</style>

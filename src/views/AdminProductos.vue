@@ -1,25 +1,24 @@
 <template>
   <div>
-    <!--Titulo y boton Agregar-->
-    <div class="d-flex flex-column align-items-center">
-      <h2 class="mt-4 mb-2">Administrar productos</h2>
-
+    <!--Titulo y botones iniciales-->
+    <div id="inicioAdmin" class="d-flex flex-column align-items-center">
+      <div class="d-flex align-items-center">
+        <h2 class="mt-4 mb-3 mx-2">Administrador de Productos</h2>
+        <router-link to="/adminventas"><b-button class="botonNegro">IR A VENTAS</b-button></router-link>
+      </div>
       <div id="buttons" class="d-flex">
-        <b-button
-          onmousedown="event.preventDefault()"
-          class="btn botonNegro mr-2"
-          @click="getProducts"
-          >Actualizar productos</b-button
-        >
         <ModalCrearProducto></ModalCrearProducto>
       </div>
 
-      <div id="buscador" class="d-flex mt-4 align-items-end">
+      <!--Buscador-->
+      <div id="buscador" class="d-flex mt-2 align-items-end">
         <p class="mb-1 mr-2">Buscar:</p>
         <b-form-input
+          id="busquedaInput"
           size="sm"
           class="mr-sm-2"
           placeholder="Nombre Producto"
+          v-model="nombreBuscado"
         ></b-form-input>
       </div>
     </div>
@@ -31,7 +30,7 @@
         responsive
         hover
         :fields="fields"
-        :items="productsdata"
+        :items="productsData"
       >
         <template>
           <p>nombre</p>
@@ -57,28 +56,26 @@
         </template>
 
         <template #cell(ofertaMonto)="data">
-          <p v-if="data.item.ofertaMonto">{{ data.item.ofertaMonto }}</p>
+          <p v-if="+data.item.ofertaMonto != 0">{{ data.item.ofertaMonto }}</p>
           <p v-else>N/A</p>
         </template>
 
         <template #cell(imagen)="data">
           <img
             style="width: 100px"
-            :src="data.item.imagen"
+            :src="data.item.imagen.url"
             alt="Imagen Producto"
           />
         </template>
 
         <template #cell(acciones)="data">
-          <div>
+          <div class="d-flex">
             <ModalEditarProducto :id="data.item.id"></ModalEditarProducto>
             <ModalEliminarProducto :id="data.item.id"></ModalEliminarProducto>
-            
           </div>
         </template>
       </b-table>
     </div>
-
   </div>
 </template>
 
@@ -89,11 +86,11 @@ import ModalEliminarProducto from "@/components/adminproductos/ModalEliminarProd
 import { mapState, mapActions } from "vuex";
 
 export default {
-  name: "Administrar",
+  name: "AdminProductos",
   components: {
     ModalCrearProducto,
     ModalEditarProducto,
-    ModalEliminarProducto
+    ModalEliminarProducto,
   },
   data() {
     return {
@@ -109,34 +106,48 @@ export default {
         { key: "imagen", label: "Imagen" },
         "Acciones",
       ],
+      nombreBuscado: "",
     };
   },
   methods: {
-    ...mapActions([
-      "get_Products",
-    ]),
-    getProducts() {
-      this.get_Products();
-    },
-
+    ...mapActions(["get_Products", "actualizarEstado"]),
   },
   computed: {
     ...mapState(["productos"]),
-    productsdata() {
-      return this.productos.map(({ data, id }) => {
+    productsData() {
+      let { productos, nombreBuscado } = this;
+      productos = productos.map(({ data, id }) => {
         const stocktotal = +data.tallas.reduce((acc, { stock }) => {
           return acc + +stock;
         }, 0);
-        let dataAMostrar = {...data}
+        let dataAMostrar = { ...data };
         dataAMostrar.stocktotal = stocktotal;
         dataAMostrar.id = id;
         return dataAMostrar;
       });
+      nombreBuscado = !""
+        ? (productos = productos.filter(({ nombre }) =>
+            nombre
+              .toLowerCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .includes(
+                nombreBuscado
+                  .toLowerCase()
+                  .normalize("NFD")
+                  .replace(/[\u0300-\u036f]/g, "")
+              )
+          ))
+        : 0;
+      return productos;
     },
   },
   created() {
+    this.actualizarEstado();
     this.get_Products();
-  }
+  },
+  beforeUpdate() {
+    this.actualizarEstado();
+  },
 };
 </script>
-

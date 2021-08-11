@@ -1,4 +1,5 @@
 <template>
+<div id="fondo" class="mb-5 pb-5">
   <div class="d-flex flex-column align-items-center">
     <h2 class="mt-4 mb-5">Quiénes somos</h2>
     <div class="container">
@@ -26,10 +27,25 @@
       </p>
     </div>
   </div>
+</div>
 </template>
 
 <style scoped>
 p {
   text-align: justify;
 }
+
+/* En caso de que contenido aumente, se debe aplicar media query al fondo:  */
+/* @media screen and (min-width: 670px) { */
+  #fondo {
+    width: 100%;
+    height: 100vh;
+    background-image: url("../assets/fondo.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+/* } */
+
 </style>

@@ -1,16 +1,44 @@
-import Vue from "vue";
-import Vuex from "vuex";
-import createPersistedState from "vuex-persistedstate";
-import firebase from "firebase";
-import router from "@/router";
 
-Vue.use(Vuex);
-
-export default new Vuex.Store({
+export default {
   state: {
     logedInUser: null,
     telonActivo: true,
-    productos: [],
+    productos: [
+      {
+        id: "dkad23a",
+        data: {
+          nombre: "Producto",
+          detalle: "Mi producto",
+          imagen: {
+            nameFile: "mi_imagen.jpg",
+            url: "http://mi_imagen.jpg"
+          },
+          estado: true,
+          precio: 10000,
+          oferta: true,
+          ofertaMonto: 2000,
+          tematica: "otros",
+          tallas: [
+            {
+              stock: "1",
+              talla: "s"
+            },
+            {
+              stock: "2",
+              talla: "m"
+            },
+            {
+              stock: "5",
+              talla: "l"
+            },
+            {
+              stock: "0",
+              talla: "xl"
+            },
+          ],
+        }
+      }
+    ],
     carrito: [],
     montoPago: 0,
     ventaActual: {},
@@ -111,7 +139,10 @@ export default new Vuex.Store({
       firebase
         .firestore()
         .collection("ventas")
-        .orderBy("createdAt", "desc")
+        .orderBy("timeStamp", "asc")
+      firebase
+        .firestore()
+        .collection("ventas")
         .onSnapshot((snapshot) => {
           const ventas = [];
           snapshot.forEach((doc) => {
@@ -215,5 +246,4 @@ export default new Vuex.Store({
       return productsInCartNumber;
     },
   },
-  plugins: [createPersistedState()],
-});
+};

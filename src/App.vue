@@ -1,8 +1,9 @@
 <template>
   <div id="app">
+    <Telon v-if="telonActivo"/>
     <Navbar />
     <router-view />
-    <img v-if="!logedInUser" id="whatsappLogo" src="@/assets/logowhatsapp.png" alt="Whatsapp Logo">
+
     <Footer />
   </div>
 </template>
@@ -10,16 +11,22 @@
 <script>
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { mapState } from 'vuex'
+import { mapState, mapActions } from "vuex";
+import Telon from "@/components/Telon";
 
 export default {
   name: "App",
   components: {
-    Navbar, Footer,
+    Navbar,
+    Footer,
+    Telon,
   },
   computed: {
-    ...mapState(["logedInUser"])
-  }
+    ...mapState(["logedInUser", "telonActivo"]),
+  },
+  methods: {
+    ...mapActions(["actualizarEstado"]),
+  },
 };
 </script>
 
@@ -66,11 +73,11 @@ p {
   }
 }
 .botonBlanco {
-  color: #ee1d23;
-  border: #ee1d23;
+  color: black;
+  border: black;
   background-color: white;
   &:hover {
-    background-color: #2c2c2c;
+    background-color: #929191;
   }
 }
 .botonNegro {
@@ -79,18 +86,5 @@ p {
   &:hover {
     background-color: #646464;
   }
-}
-#whatsappLogo {
-  height: 80px;
-  position: fixed;
-  z-index: 2;
-  bottom: 30px;
-  right: 30px;
-}
-@media screen and (max-width: 350px) {
-#whatsappLogo {
-  bottom: 20px;
-  right: 20px;
-}
 }
 </style>

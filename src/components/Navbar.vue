@@ -25,20 +25,32 @@
         <b-navbar-nav class="d-flex justify-content-center">
           <b-nav-item to="/">Tienda</b-nav-item>
           <b-nav-item to="quienessomos">Quienes somos</b-nav-item>
-          <b-nav-item to="formulariodecontacto"
+          <!--Para futuras etapas de desarrollo:-->
+          <!-- <b-nav-item to="formulariodecontacto"
             >Contacto</b-nav-item
-          >
+          > -->
           <b-nav-item to="terminosycondiciones"
             >Términos y condiciones</b-nav-item
           >
-          <h5 id="badgeAdministracion" v-if="logedInUser" class="mb-0">
+          <b-nav-item><h5 id="badgeAdministracion" v-if="logedInUser" class="mb-0">
             <b-badge to="adminproductos" variant="light">Administrar</b-badge>
-          </h5>
+          </h5></b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
-        <b-navbar-nav class="ml-auto" id="adminInfo">
-          <b-nav-text v-if="logedInUser" class="mr-2">{{
+        <b-navbar-nav class="ml-auto">
+              <div id="navCartIcon" class="d-flex align-items-center">
+                <b-nav-item to="/carrito"><b-icon
+                  icon="cart-fill"
+                  variant="light"
+                  font-scale="2"
+                  id="cartIcon"
+                  
+                ></b-icon></b-nav-item>
+                <b-badge pill variant="danger">{{getCartNumber}}</b-badge>
+              </div>
+              <div id="adminInfo">
+         <b-nav-text v-if="logedInUser" class="mr-2">{{
             logedInUser
           }}</b-nav-text>
           <b-icon
@@ -57,6 +69,8 @@
             font-scale="2"
             @click="logOut"
           ></b-icon>
+              </div>
+ 
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
@@ -64,7 +78,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapGetters } from "vuex";
 import firebase from "firebase";
 
 export default {
@@ -86,6 +100,7 @@ export default {
   },
   computed: {
     ...mapState(["logedInUser"]),
+    ...mapGetters(["getCartNumber"])
   },
 };
 </script>
@@ -133,6 +148,9 @@ h1 {
     display: flex;
     align-items: center;
   }
+  #navCartIcon {
+    margin-right: 10px;
+  }
 }
 
 @media screen and (max-width: 994px) {
@@ -140,9 +158,14 @@ h1 {
     display: flex;
     flex-direction: row;
     align-items: center;
+    margin-top: 30px;
   }
   #badgeAdministracion {
     margin-top: 5px;
+    padding-bottom: 10px;
+  }
+    #navCartIcon {
+    padding-top: 10px;
   }
 }
 </style>

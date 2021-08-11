@@ -2,6 +2,7 @@
   <div>
     <b-button
       onmousedown="event.preventDefault()"
+      id="agregarBtn"
       class="btn botonRojo"
       @click="showModal"
       >Agregar nuevo producto</b-button
@@ -36,6 +37,7 @@
             <div class="d-flex align-items-center">
               <p class="m-0">s:</p>
               <b-form-input
+                id="sInput"
                 v-model="nuevoProducto.tallas[0].stock"
                 type="number"
                 required
@@ -46,6 +48,7 @@
             <div class="d-flex align-items-center">
               <p class="m-0">m:</p>
               <b-form-input
+                id="mInput"
                 v-model="nuevoProducto.tallas[1].stock"
                 type="number"
                 required
@@ -56,6 +59,7 @@
             <div class="d-flex align-items-center">
               <p class="m-0">l:</p>
               <b-form-input
+                id="lInput"
                 v-model="nuevoProducto.tallas[2].stock"
                 type="number"
                 required
@@ -64,8 +68,9 @@
               ></b-form-input>
             </div>
             <div class="d-flex align-items-center">
-              <p class="m-0">cl:</p>
+              <p class="m-0">xl:</p>
               <b-form-input
+                id="xlInput"
                 v-model="nuevoProducto.tallas[3].stock"
                 type="number"
                 required
@@ -89,7 +94,7 @@
 
         <!--Temática-->
         <b-form-group id="input-group-6" label="Temática:" label-for="input-6">
-          <b-form-select v-model="nuevoProducto.tematica">
+          <b-form-select v-model="nuevoProducto.tematica" id="tematicaSelector">
             <b-form-select-option value="frases"
               >Fraces Motivacionales</b-form-select-option
             >
@@ -113,7 +118,7 @@
 
         <!--Oferta-->
         <b-form-group id="input-group-4" label="Oferta:" label-for="input-4">
-          <b-form-select v-model="nuevoProducto.oferta">
+          <b-form-select v-model="nuevoProducto.oferta" id="ofertaSelector">
             <b-form-select-option type="boolean" :value="true"
               >Sí</b-form-select-option
             >
@@ -142,40 +147,48 @@
         <!--Imagen-->
         <b-form-group
           id="input-group-6"
-          label="Url imagen:"
+          label="Imagen:"
           label-for="input-6"
         >
-          <b-form-input
+          <b-form-file
             id="input-6"
-            v-model="nuevoProducto.imagen"
-            type="text"
-            placeholder="Ej: http://ejemplo.imagen.jpg"
+            v-model="file"
+            placeholder="Selecciona una imagen o arrastrala aquí..."
+            drop-placeholder="Arrastrala aquí..."
+            @change="setImg"
             required
-          ></b-form-input>
+          ></b-form-file>
           <div
             class="d-flex justify-content-center align-items-center my-2"
-            v-if="nuevoProducto.imagen"
+            v-if="imgForPreview"
           >
             <p>Tu imagen:</p>
             <img
               id="imagenDePrueba"
-              :src="nuevoProducto.imagen"
+              :src="imgForPreview"
               alt="Imagen Producto"
             />
           </div>
         </b-form-group>
       </div>
       <div class="buttons d-flex justify-content-center">
-        <b-button @click="sendNewProduct" class="btn botonNegro m-2"
-          >Agregar</b-button>
-        <b-button class="btn botonRojo m-2" @click="hideModal">Cancelar</b-button>
+        <b-button
+          @click="sendNewProduct"
+          class="btn botonNegro m-2"
+          id="finalizarAgregarBtn"
+          >Agregar</b-button
+        >
+        <b-button class="btn botonRojo m-2" @click="hideModal"
+          >Cancelar</b-button
+        >
       </div>
     </b-modal>
   </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions } from "vuex";
+import firebase from 'firebase';
 
 export default {
   name: "ModalCrearProducto",
@@ -194,67 +207,75 @@ export default {
         estado: true,
         oferta: false,
         ofertaMonto: 0,
-        imagen: "",
+        imagen: {},
         tematica: "",
       },
+      file: null,
+      imgForPreview: "",
     };
   },
   methods: {
     ...mapActions(["create_Product"]),
-    sendNewProduct() {
-      const {
-        nombre,
-        precio,
-        detalle,
-        oferta,
-        ofertaMonto,
-        imagen,
-        tematica,
-        tallas,
-      } = this.nuevoProducto;
-      if (
-        nombre == "" ||
-        precio == 0 ||
-        detalle == "" ||
-        imagen == "" ||
-        tematica == ""
-      ) {
+    async sendNewProduct() {
+      try {
+        const {
+          nombre,
+          precio,
+          detalle,
+          oferta,
+          ofertaMonto,
+          imagen,
+          tematica,
+          tallas,
+        } = this.nuevoProducto;
+        if (
+          nombre == "" ||
+          precio == 0 ||
+          detalle == "" ||
+          tematica == ""
+        ) {
         alert("Debes completar todos los campos.");
-      } else if (oferta && ofertaMonto == 0) {
+        } else if (!this.file) {
+        alert("Debes incluir una imagen.");
+        } else if (oferta && ofertaMonto == 0) {
         alert(
           "Si el producto está en oferta, debes indicar el monto de descuento."
         );
-      } else if (oferta == true && +ofertaMonto >= +precio) {
+        } else if (oferta == true && +ofertaMonto >= +precio) {
         alert("El descuento por oferta debe ser inferior al precio original.");
-      } else {
-
-      if (
-        tallas.reduce((acc, { stock }) => {
-          return acc + +stock;
-        }, 0) == 0
-      ) {
-        this.nuevoProducto.estado = false;
-        
-      } 
-      const newProduct = { ...this.nuevoProducto };
+        } else {
+        if (
+          tallas.reduce((acc, { stock }) => {
+            return acc + +stock;
+          }, 0) == 0
+        ) {
+          this.nuevoProducto.estado = false;
+        }
+        await this.uploadFile();
+        const newProduct = { ...this.nuevoProducto };
         this.createProduct(newProduct);
         this.nuevoProducto = {
           nombre: "",
           tallas: [
-            { talla: "s", stock: 0 },
-            { talla: "m", stock: 0 },
-            { talla: "l", stock: 0 },
-            { talla: "xl", stock: 0 },
-          ],
-          precio: 0,
-          detalle: "",
-          estado: true,
-          oferta: false,
-          ofertaMonto: 0,
-          imagen: "",
-          tematica: "",
+              { talla: "s", stock: 0 },
+              { talla: "m", stock: 0 },
+              { talla: "l", stock: 0 },
+              { talla: "xl", stock: 0 },
+            ],
+            precio: 0,
+            detalle: "",
+            estado: true,
+            oferta: false,
+            ofertaMonto: 0,
+            imagen: {},
+            tematica: "",
         };
+        this.file = null;
+        this.imgForPreview = "";
         this.hideModal();
+        }
+      } catch (e) {
+        console.log(e)
       }
     },
     createProduct(newProduct) {
@@ -266,6 +287,27 @@ export default {
     hideModal() {
       this.$refs["create-product-modal"].hide();
     },
+    setImg(e) {
+      const file = e.target.files[0];
+      this.file = file;
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        this.imgForPreview = reader.result;
+      };
+    },
+    async uploadFile() {
+      const { file, file: { name: nameFile } } = this;
+      const storageRef = firebase.storage().ref();
+      const fileDirection = storageRef.child(`imagenesproductos/${nameFile}`);
+      await fileDirection.put(file);
+      const url = await fileDirection.getDownloadURL();
+      this.nuevoProducto.imagen = {
+        url,
+        nameFile,
+      };
+      return true;
+    }
   },
 };
 </script>
