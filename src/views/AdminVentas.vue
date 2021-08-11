@@ -2,7 +2,7 @@
   <div>
     <!--Titulo y botones iniciales-->
     <div id="inicioAdmin" class="d-flex flex-column align-items-center">
-      <div class="d-flex align-items-center">
+      <div class="cabecera d-flex align-items-center">
         <h2 class="mt-4 mb-3 mx-2">Lista de Ventas</h2>
         <router-link to="/adminproductos"><b-button class="botonNegro">IR A PRODUCTOS</b-button></router-link>
       </div>
@@ -22,7 +22,7 @@
     </div>
 
     <!--Ventas-->
-    <div class="mx-5 d-flex flex-wrap justify-content-center mb-5 pb-3" >
+    <div class="mx-3 d-flex flex-wrap justify-content-center mb-5 pb-3" >
     <b-card v-for="({data}, i) in ventasFiltradas" :key="i" no-body class="overflow-hidden m-1 border-danger" style="width: 700px;">
     <b-row no-gutters>
       <b-col md="4">
@@ -123,3 +123,11 @@ export default {
 };
 </script>
 
+<style scoped>
+@media screen and (max-width: 530px) {
+  .cabecera {
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+}
+</style>

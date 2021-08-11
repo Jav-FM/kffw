@@ -1,6 +1,6 @@
 <template>
-  <div class="d-flex flex-column align-items-center pb-4 mb-5">
-    <h2 class="mt-4 mb-5">Completa tus datos para comprar</h2>
+  <div id="transbank" class="d-flex flex-column align-items-center pb-4 mb-5mx-2">
+    <h2 class="mt-4 mb-5">Completa tus datos</h2>
     <div class="d-flex">
       <div id="kunfFuImg" class="mr-5 pr-4">
         <img
@@ -9,7 +9,7 @@
           alt="Kung Fu Img"
         />
       </div>
-      <div>
+      <div class="mx-3">
         <b-form @submit="onSubmit">
           <b-form-group id="input-group-1">
             <b-form-input
@@ -158,3 +158,16 @@ export default {
     },
 }
 </script>
+
+<style scoped>
+#transbank {
+height: 100%;
+margin-bottom: 50px;
+}
+
+@media screen and (max-width: 580px) {
+  #kunfFuImg {
+    display: none;
+  }
+}
+</style>

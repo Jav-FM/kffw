@@ -1,8 +1,8 @@
 <template>
   <div>
     <!--Titulo y botones iniciales-->
-    <div id="inicioAdmin" class="d-flex flex-column align-items-center">
-      <div class="d-flex align-items-center">
+    <div class="d-flex flex-column align-items-center">
+      <div id="cabecera" class="cabecera d-flex align-items-center justify-content-center">
         <h2 class="mt-4 mb-3 mx-2">Administrador de Productos</h2>
         <router-link to="/adminventas"><b-button class="botonNegro">IR A VENTAS</b-button></router-link>
       </div>
@@ -24,7 +24,7 @@
     </div>
 
     <!--Tabla-->
-    <div class="mx-5">
+    <div class="mx-3">
       <b-table
         class="my-5"
         responsive
@@ -151,3 +151,13 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+
+@media screen and (max-width: 530px) {
+  .cabecera {
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+}
+</style>

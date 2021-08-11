@@ -89,7 +89,7 @@ describe("Using administration sistem", () => {
       "{backspace}{backspace}{backspace}{backspace}{backspace}Editada"
     );
     const guardarCambiosBtn = cy.get("#guardarCambiosBtn").pause();
-    guardarCambiosBtn.click().pause();
+    guardarCambiosBtn.click();
   });
 
   it("Delete a Product", () => {
