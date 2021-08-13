@@ -53,14 +53,13 @@
          <b-nav-text v-if="logedInUser" class="mr-2">{{
             logedInUser
           }}</b-nav-text>
-          <b-icon
+          <b-nav-item to="/login"><b-icon
             v-if="!logedInUser"
             class="logIcon"
             icon="box-arrow-in-right"
             variant="light"
             font-scale="2"
-            @click="goToLogin"
-          ></b-icon>
+          ></b-icon></b-nav-item>
           <b-icon
             v-if="logedInUser"
             class="logIcon ml-1"

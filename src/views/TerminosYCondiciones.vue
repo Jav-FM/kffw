@@ -35,8 +35,8 @@ p {
   text-align: justify;
 }
 
-/* En caso de que contenido aumente, se debe aplicar media query al fondo:  */
-/* @media screen and (min-width: 670px) { */
+
+@media screen and (min-width: 670px) {
   #fondo {
     width: 100%;
     height: 100vh;
@@ -46,5 +46,6 @@ p {
     background-size: cover;
     background-attachment: fixed;
   }
-/* } */
+}
+
 </style>

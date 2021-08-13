@@ -3,7 +3,7 @@
     <!--Titulo y botones iniciales-->
     <div class="d-flex flex-column align-items-center">
       <div id="cabecera" class="cabecera d-flex align-items-center justify-content-center">
-        <h2 class="mt-4 mb-3 mx-2">Administrador de Productos</h2>
+        <h2 class="mt-4 mb-3 mx-2">Tus Productos</h2>
         <router-link to="/adminventas"><b-button class="botonNegro">IR A VENTAS</b-button></router-link>
       </div>
       <div id="buttons" class="d-flex">

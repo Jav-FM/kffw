@@ -99,7 +99,6 @@ import { mapActions, mapState } from 'vuex';
 export default {
     data() {
         return{
-            return_url: "http://localhost:8081/",
             form: {
                 name: "",
                 email: "",
@@ -138,7 +137,9 @@ export default {
                 fecha: fechaDeHoy,
             }
             this.guardar_Venta(ventaNueva);
-            window.location = `http://localhost:5000/api/v1/tbk/?montoPago=${montoPago}&buyOrder=${buyOrder}`
+            window.location = `https://kffwserver.herokuapp.com/api/v1/tbk/?montoPago=${montoPago}&buyOrder=${buyOrder}`
+            //Server arriba: https://kffwserver.herokuapp.com/
+            //Server local:http://localhost:5000/
         }
     },
     computed: {
@@ -162,7 +163,7 @@ export default {
 <style scoped>
 #transbank {
 height: 100%;
-margin-bottom: 50px;
+margin-bottom: 70px;
 }
 
 @media screen and (max-width: 580px) {
